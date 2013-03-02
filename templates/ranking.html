@@ -1,0 +1,23 @@
+$def with (d)
+
+<a href="/">back</a>
+<h1>RankingLinst</h1>
+
+$def show_elm(r):
+    <p>
+    rank=$r['rank']<br/>
+    <img src="$r['img']"/><br/>
+    title=$r['title']
+    </p>
+$def show_img(r):
+    <a href="$r['link']" target="_blank">
+    <img src="$r['img']" title="$r['title']"/>
+    </a>
+<table>
+$for ri in d['datas']:
+   <tr>
+   <td>$ri.country</td>
+   $for r in ri.ranking_data:
+         <td valign="top">$:show_img(r)</td>
+   </tr>
+</table>

@@ -1,0 +1,12 @@
+$def with (d)
+
+<h1>desire list</h1>
+
+$for m in d['ttp']:
+   $for f in d['ttp'][m]:
+      <p>
+      <a href="/ranking?media=$m&field=$f&from=$d['fd'].strftime('%Y-%m-%d')&to=$d['to'].strftime('%Y-%m-%d')">
+      $m&nbsp;$f
+      </a>
+      </p>
+           

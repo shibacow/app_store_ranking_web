@@ -10,6 +10,7 @@ import selector_info
 import ranking_info
 
 urls=(
+    '/ranking_date.*',ranking_info.RankingDate,
     '/ranking.*',ranking_info.Ranking,
     '/.*','Index')
 
@@ -38,7 +39,7 @@ class Index(object):
     def GET(self,*args,**keys):
         d={}
         fd=datetime(2013,1,13)
-        to=datetime(2013,2,19)
+        to=datetime(2013,3,3)
         d['fd']=fd
         d['to']=to
         d['ttp']=self.get_group_date(fd,to)

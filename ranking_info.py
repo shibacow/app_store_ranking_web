@@ -80,3 +80,36 @@ class Ranking(object):
         d['datas']=datas
         return render.ranking(d)
     
+class RankingDate(object):
+    def __get_meta_data(self,mp,fd,to,inputs):
+        m=inputs['media']
+        f=inputs['field']
+        dk={"mediatype":m,"fieldtype":f,\
+            "fetch_date":{"$lt":to,"$gte":fd}}
+        return mp.find_all(mp.RANKING_META_DATA,dk)
+    def __get_raw_data(self,mp,raw_id):
+        dk={'_id':raw_id}
+        raw=mp.is_exists(mp.RANKING_RAW_DATA,dk)
+        return raw
+
+    def __get_ranking(self,mp,inputs):
+        fd=inputs['from']
+        to=inputs['to']
+        fd=datetime.strptime(fd,'%Y-%m-%d')
+        to=datetime.strptime(to,'%Y-%m-%d')
+        metas=self.__get_meta_data(mp,fd,to,inputs)
+        datas=[]
+        for r in metas:
+            rr=self.__get_raw_data(mp,r['ranking_raw_id'])
+            r=RankingInfo(rr)
+            if r.ranking_data:
+                datas.append(r)
+        return datas
+    def GET(self,*args,**keys):
+        d={}
+        inputs=web.input()
+        mp=web.ctx.mongo
+        datas=self.__get_ranking(mp,inputs)
+        d['datas']=datas
+        return render.ranking(d)
+    

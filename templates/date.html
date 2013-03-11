@@ -1,12 +1,14 @@
 $def with (d)
 
 <h1>Date list</h1>
-
-$for m in d['ttp']:
-   $for f in d['ttp'][m]:
+$ media=d['data']['media']
+$ field=d['data']['field']
+$for dt in d['data']['dates']:
       <p>
-      <a href="/ranking?media=$m&field=$f&from=$d['fd'].strftime('%Y-%m-%d')&to=$d['to'].strftime('%Y-%m-%d')">
-      $m&nbsp;$f
+      <a href="/ranking?media=$media&field=$field&from=$dt[0].strftime('%Y-%m-%d')&to=$dt[1].strftime('%Y-%m-%d')">
+      $media&nbsp;$field&nbsp;$dt[0]
       </a>
       </p>
+           
+
            

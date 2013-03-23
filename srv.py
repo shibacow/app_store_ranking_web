@@ -39,7 +39,7 @@ class Index(object):
     def GET(self,*args,**keys):
         d={}
         fd=datetime(2013,1,13)
-        to=datetime(2013,3,3)
+        to=datetime.now()
         d['fd']=fd
         d['to']=to
         d['ttp']=self.get_group_date(fd,to)

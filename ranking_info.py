@@ -54,6 +54,7 @@ class Ranking(object):
         f=inputs['field']
         self.media=m
         self.field=f
+        self.filtercountry=inputs.get('filtercountry',None)
         dk={"mediatype":m,"fieldtype":f,\
             "fetch_date":{"$lt":to,"$gte":fd}}
         return mp.find_all(mp.RANKING_META_DATA,dk)
@@ -67,14 +68,27 @@ class Ranking(object):
         to=inputs['to']
         fd=datetime.strptime(fd,'%Y-%m-%d')
         to=datetime.strptime(to,'%Y-%m-%d')
+        #to=to+timedelta(days=1)
         metas=self.__get_meta_data(mp,fd,to,inputs)
         datas=[]
-
+        clist=None
+        cset=set()
+        if self.filtercountry:
+            if self.filtercountry=='G8':
+                clist=selector_info.G8
+            elif self.filtercountry=='G20':
+                clist=selector_info.G20
         for r in metas:
+            if clist and not r['country'] in clist:
+                continue
+            if r['country'] in cset:continue
+
             rr=self.__get_raw_data(mp,r['ranking_raw_id'])
-            r=RankingInfo(rr)
-            if r.ranking_data:
-                datas.append(r)
+            if rr:
+                r2=RankingInfo(rr)
+                if r2.ranking_data:
+                    datas.append(r2)
+            cset.add(r['country'])
         return datas
     def GET(self,*args,**keys):
         d={}
@@ -99,6 +113,7 @@ class RankingDate(object):
         to=inputs['to']
         fd=datetime.strptime(fd,'%Y-%m-%d')
         to=datetime.strptime(to,'%Y-%m-%d')
+        to=to+timedelta(days=1)
         metas=self.__get_meta_data(mp,fd,to,inputs)
         dds={}
         for m in metas:

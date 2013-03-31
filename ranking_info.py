@@ -7,17 +7,15 @@ import re
 import selector_info
 
 class RankingInfo(object):
-    def __parseOrder(self,feed):
+    def __parseOrder(self,feed,offset,limit):
         if not 'entry' in feed:
             return
         entries=feed['entry']
-        limit=30
+        self.maxsize=max(len(entries),self.maxsize)
         if isinstance(entries,list):
-            if len(entries)>limit:
-                entries=entries[:limit]
+            entries=entries[offset:offset+limit]
             for i,elm in enumerate(entries):
                 r=i+1
-            #web.debug(elm)
                 title=elm['title']['label']
                 summary=''
                 if 'summary' in elm:
@@ -40,12 +38,15 @@ class RankingInfo(object):
             pass
             #web.debug(type(entries))
             #web.debug(entries)
-    def __init__(self,rr):
+    def __init__(self,rr,offset,limit):
+        self.offset=offset
+        self.limit=limit
+        self.maxsize=0
         self.country=selector_info.country_list.get(rr['country'],rr['country'])
         feed=rr['feed']
         self.title=feed['title']['label']
         self.ranking_data=[]
-        self.__parseOrder(feed)
+        self.__parseOrder(feed,offset,limit)
 
 
 class Ranking(object):
@@ -64,10 +65,22 @@ class Ranking(object):
         return raw
 
     def __get_ranking(self,mp,inputs):
+        maxsize=0
         fd=inputs['from']
         to=inputs['to']
         fd=datetime.strptime(fd,'%Y-%m-%d')
         to=datetime.strptime(to,'%Y-%m-%d')
+        offset=0
+        limit=30
+        if 'offset' in inputs and inputs['offset'].isdigit():
+            offset=int(inputs['offset'])
+        if 'limit' in inputs and inputs['limit'].isdigit():
+            limit=int(inputs['limit'])
+        self.offset=offset
+        self.limit=limit
+        self.fd=fd
+        self.to=to
+
         #to=to+timedelta(days=1)
         metas=self.__get_meta_data(mp,fd,to,inputs)
         datas=[]
@@ -78,6 +91,8 @@ class Ranking(object):
                 clist=selector_info.G8
             elif self.filtercountry=='G20':
                 clist=selector_info.G20
+            elif self.filtercountry=='TOP50':
+                clist=selector_info.TOP50
         for r in metas:
             if clist and not r['country'] in clist:
                 continue
@@ -85,36 +100,47 @@ class Ranking(object):
 
             rr=self.__get_raw_data(mp,r['ranking_raw_id'])
             if rr:
-                r2=RankingInfo(rr)
+                r2=RankingInfo(rr,offset,limit)
+                maxsize=max(r2.maxsize,maxsize)
                 if r2.ranking_data:
                     datas.append(r2)
             cset.add(r['country'])
-        return datas
+        minx=min(maxsize,offset+limit)
+        ranknums=[i+1 for i in range(offset,minx)]
+        return datas,ranknums,maxsize
+    def generate_pagenate(self,maxsize,offset,limit):
+        dd=maxsize/limit
+        pg=[(i*limit,limit) for i in range(dd)]
+        return pg
     def GET(self,*args,**keys):
         d={}
         inputs=web.input()
         mp=web.ctx.mongo
-        datas=self.__get_ranking(mp,inputs)
+        datas,ranknums,maxsize=self.__get_ranking(mp,inputs)
+        d['ranknums']=ranknums
+        d['maxsize']=maxsize
         d['media']=self.media
         d['field']=self.field
+        d['limit']=self.limit
+        d['offset']=self.offset
+        d['start']=self.offset+1
+        d['end']=self.offset+self.limit
+        d['fd']=self.fd
+        d['to']=self.to
         d['datas']=datas
+        d['filtercountry']=self.filtercountry
+        d['pg']=self.generate_pagenate(maxsize,self.offset,self.limit)
         return render.ranking(d)
     
 class RankingDate(object):
-    def __get_meta_data(self,mp,fd,to,inputs):
+    def __get_meta_data(self,mp,inputs):
         m=inputs['media']
         f=inputs['field']
-        dk={"mediatype":m,"fieldtype":f,\
-            "fetch_date":{"$lt":to,"$gte":fd}}
+        dk={"mediatype":m,"fieldtype":f}
         return mp.find_all(mp.RANKING_META_DATA,dk)
 
     def __get_ranking(self,mp,inputs):
-        fd=inputs['from']
-        to=inputs['to']
-        fd=datetime.strptime(fd,'%Y-%m-%d')
-        to=datetime.strptime(to,'%Y-%m-%d')
-        to=to+timedelta(days=1)
-        metas=self.__get_meta_data(mp,fd,to,inputs)
+        metas=self.__get_meta_data(mp,inputs)
         dds={}
         for m in metas:
             dt=m['fetch_date'].strftime("%Y-%m-%d")

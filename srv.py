@@ -23,13 +23,13 @@ app=web.application(urls,globals())
 app.add_processor(web.loadhook(mongo_hook))
 
 class Index(object):
-    def get_group_date(self,fd,to):
+    def get_group(self):
         ttp={}
         mp=web.ctx.mongo
         dk={'key':{'country':True,'mediatype':True,'fieldtype':True},
-            'condition':{'fetch_date':{'$lt':to,'$gte':fd}},
+            'condition':{},
             'reduce':'function(prev,obj){}',
-            'initial':{'dates':0}}
+            'initial':{'dates':[]}}
         rr=mp.group(mp.RANKING_META_DATA,dk)
         for r in rr:
             ttp.setdefault(r['mediatype'],{})
@@ -38,11 +38,7 @@ class Index(object):
         return ttp
     def GET(self,*args,**keys):
         d={}
-        fd=datetime(2013,1,13)
-        to=datetime.now()
-        d['fd']=fd
-        d['to']=to
-        d['ttp']=self.get_group_date(fd,to)
+        d['ttp']=self.get_group()
         return render.index(d)
 
 def main():

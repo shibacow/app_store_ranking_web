@@ -1,10 +1,17 @@
 $def with (d)
 
-<a href="/">back</a>
+<a href="/">home</a>
 <h1>RankingLinst</h1>
-<h3>$d['media']</h3>
-<h3>$d['field']</h3>
-
+<p>
+$d['fd'].strftime('%Y-%m-%d')のランキング<br/>
+Media:$d['media']&nbsp;Field:$d['field']<br/>
+ランキング個数:$d['maxsize']&nbsp;$d['start']位から$d['end']位まで<br/>
+</p>
+<div>
+$for p,l in d['pg']:
+   <a href="/ranking?media=$d['media']&field=$d['field']&from=$d['fd'].strftime('%Y-%m-%d')&to=$d['to'].strftime('%Y-%m-%d')&offset=$p&limit=$l&filtercountry=$d['filtercountry']">$(p+1)位</a>
+</div>
+<div>
 $def show_elm(r):
     <p>
     rank=$r['rank']<br/>
@@ -16,6 +23,11 @@ $def show_img(r):
     <img src="$r['img']" title="$r['title']"/>
     </a>
 <table>
+<tr>
+<th></th>
+$for rn in d['ranknums']:
+   <th>$rn位</th>
+</tr>
 $for ri in d['datas']:
    <tr>
    <td>$ri.country</td>
@@ -23,3 +35,4 @@ $for ri in d['datas']:
          <td valign="top">$:show_img(r)</td>
    </tr>
 </table>
+</div>

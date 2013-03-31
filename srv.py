@@ -7,7 +7,7 @@ if not currdir in sys.path:
     app_path=currdir+os.sep+'../app_store_ranking'
     sys.path.append(app_path)
 
-from datetime import datetime
+from datetime import datetime,timedelta
 from mog_op import MongoOp,ObjectId
 import web
 import re
@@ -30,6 +30,21 @@ app=web.application(urls,globals())
 app.add_processor(web.loadhook(mongo_hook))
 
 class Index(object):
+    def cache_chack(self):
+        mp=web.ctx.mongo
+        cdist=dict(key='front',expired_time={"$gte":datetime.now()})
+        rr=mp.is_exists(mp.CACHE_DATA,cdist)
+        if rr:
+            web.debug("cache hits")
+            return rr['body']
+        else:
+            web.debug("cache hits")
+            tpp=self.get_group()
+            extime=datetime.now()+timedelta(hours=3)
+            cdist=dict(key='front',expired_time=extime,body=tpp)
+            mp.save(mp.CACHE_DATA,cdist)
+            return tpp
+            
     def get_group(self):
         ttp={}
         mp=web.ctx.mongo
@@ -40,12 +55,12 @@ class Index(object):
         rr=mp.group(mp.RANKING_META_DATA,dk)
         for r in rr:
             ttp.setdefault(r['mediatype'],{})
-            ttp[r['mediatype']].setdefault(r['fieldtype'],set())
-            ttp[r['mediatype']][r['fieldtype']].add(r['country'])
+            ttp[r['mediatype']].setdefault(r['fieldtype'],[])
+            ttp[r['mediatype']][r['fieldtype']].append(r['country'])
         return ttp
     def GET(self,*args,**keys):
         d={}
-        d['ttp']=self.get_group()
+        d['ttp']=self.cache_chack()
         return render.index(d)
 
 def main():

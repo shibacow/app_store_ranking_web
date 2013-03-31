@@ -5,7 +5,7 @@ $def with (d)
 $for m in d['ttp']:
    $for f in d['ttp'][m]:
       <p>
-      <a href="/ranking_date?media=$m&field=$f">
+      <a href="$homepath()/ranking_date?media=$m&field=$f">
       $m&nbsp;$f
       </a>
       </p>

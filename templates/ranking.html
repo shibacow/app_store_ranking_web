@@ -1,6 +1,6 @@
 $def with (d)
 
-<a href="/">home</a>
+<a href="$homepath()/">home</a>
 <h1>RankingLinst</h1>
 <p>
 $d['fd'].strftime('%Y-%m-%d')のランキング<br/>
@@ -9,7 +9,7 @@ Media:$d['media']&nbsp;Field:$d['field']<br/>
 </p>
 <div>
 $for p,l in d['pg']:
-   <a href="/ranking?media=$d['media']&field=$d['field']&from=$d['fd'].strftime('%Y-%m-%d')&to=$d['to'].strftime('%Y-%m-%d')&offset=$p&limit=$l&filtercountry=$d['filtercountry']">$(p+1)位</a>
+   <a href="$homepath()/ranking?media=$d['media']&field=$d['field']&from=$d['fd'].strftime('%Y-%m-%d')&to=$d['to'].strftime('%Y-%m-%d')&offset=$p&limit=$l&filtercountry=$d['filtercountry']">$(p+1)位</a>
 </div>
 <div>
 $def show_elm(r):

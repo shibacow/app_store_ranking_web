@@ -1,7 +1,12 @@
 #!/usr/bin/python
 # -*- coding:utf-8 -*-
 import os,sys
-sys.path.append('../app_store_ranking')
+currdir=os.path.dirname(__file__)
+if not currdir in sys.path:
+    sys.path.append(currdir)
+    app_path=currdir+os.sep+'../app_store_ranking'
+    sys.path.append(app_path)
+
 from datetime import datetime
 from mog_op import MongoOp,ObjectId
 import web
@@ -14,7 +19,9 @@ urls=(
     '/ranking.*',ranking_info.Ranking,
     '/.*','Index')
 
-render=web.template.render('templates')
+def homepath():
+    return web.ctx.homepath
+render=web.template.render(currdir+os.sep+'templates',globals={'homepath':homepath})
 ranking_info.render=render
 
 def mongo_hook():
@@ -44,3 +51,4 @@ class Index(object):
 def main():
     app.run()
 if __name__=='__main__':main()
+application=app.wsgifunc()

@@ -15,8 +15,11 @@ $for dt in d['data']['dates']:
       G20
       <a href="$homepath()/ranking?media=$media&field=$field&from=$dt[0].strftime('%Y-%m-%d')&to=$dt[1].strftime('%Y-%m-%d')&filtercountry=TOP50">
       TOP50
+      <a href="$homepath()/interranking?media=$media&field=$field&from=$dt[0].strftime('%Y-%m-%d')&to=$dt[1].strftime('%Y-%m-%d')&filtercountry=TOP50">
+     InterCrossAppRanking
+
+      </a>
+      <a href="$homepath()/publisherranking?media=$media&field=$field&from=$dt[0].strftime('%Y-%m-%d')&to=$dt[1].strftime('%Y-%m-%d')&filtercountry=TOP50">
+     PublisherRanking
       </a>
       </p>
-           
-
-           

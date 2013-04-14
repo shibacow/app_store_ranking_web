@@ -1,0 +1,28 @@
+$def with (d)
+
+<a href="$homepath()/">home</a>
+<h1>RankingLinst</h1>
+<p>
+$d['fd'].strftime('%Y-%m-%d')のランキング<br/>
+Media:$d['media']&nbsp;Field:$d['field']<br/>
+</p>
+
+$def showinfo(a):
+   <p>
+   $for ai in a:
+       <a href="$ai.link" target="_blank">
+       <img src="$ai.img" title="$ai.title"/>
+       </a>
+   </p>
+<div>
+<table border="1">
+<tr>
+<th>ランキング入り国数</th><th>アプリ情報</th>
+</tr>
+$for a,b in d['sorted_data']:
+    <tr>
+    <td>$a</td>
+    <td>$:showinfo(b)</td>
+    </tr>
+</table>
+</div>

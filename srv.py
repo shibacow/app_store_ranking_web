@@ -17,11 +17,19 @@ import ranking_info
 urls=(
     '/ranking_date.*',ranking_info.RankingDate,
     '/ranking.*',ranking_info.Ranking,
+    '/interranking.*',ranking_info.InternationalRanking,
+    '/publisherranking.*',ranking_info.PublisherRanking,
     '/.*','Index')
 
 def homepath():
     return web.ctx.homepath
-render=web.template.render(currdir+os.sep+'templates',globals={'homepath':homepath})
+def web_trim(sstr):
+    limit=20
+    if len(sstr)>limit:
+        sstr=sstr[:limit]+'...'
+    return sstr
+
+render=web.template.render(currdir+os.sep+'templates',globals={'homepath':homepath,'sorted':sorted,'web_trim:':web_trim})
 ranking_info.render=render
 
 def mongo_hook():

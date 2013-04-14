@@ -12,15 +12,10 @@ $for p,l in d['pg']:
    <a href="$homepath()/ranking?media=$d['media']&field=$d['field']&from=$d['fd'].strftime('%Y-%m-%d')&to=$d['to'].strftime('%Y-%m-%d')&offset=$p&limit=$l&filtercountry=$d['filtercountry']">$(p+1)位</a>
 </div>
 <div>
-$def show_elm(r):
-    <p>
-    rank=$r['rank']<br/>
-    <img src="$r['img']"/><br/>
-    title=$r['title']
-    </p>
+
 $def show_img(r):
-    <a href="$r['link']" target="_blank">
-    <img src="$r['img']" title="$r['title']"/>
+    <a href="$r.link" target="_blank">
+    <img src="$r.img" title="$r.title"/>
     </a>
 <table>
 <tr>
